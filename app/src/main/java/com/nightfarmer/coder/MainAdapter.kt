@@ -26,6 +26,7 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.MyHolder>() {
 
         Glide.with(holder.itemView.context)
                 .load("http://nightfarmer.github.io/public/static/image/BezierDrawer.gif")
+                .placeholder(R.mipmap.ic_launcher)
 //                .load(Uri.parse("http://img.blog.csdn.net/20150826183423554"))
                 .into(holder.itemView.image)
 
