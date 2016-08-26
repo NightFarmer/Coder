@@ -1,10 +1,13 @@
-package com.nightfarmer.coder
+package com.nightfarmer.coder.main
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
+import com.nightfarmer.coder.R
+import com.nightfarmer.coder.ScrollingActivity
+import com.nightfarmer.coder.detail.AppDetailActivity
 import kotlinx.android.synthetic.main.layout_app_item.view.*
 import org.jetbrains.anko.onClick
 import org.jetbrains.anko.startActivity
@@ -31,12 +34,23 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.MyHolder>() {
                 .into(holder.itemView.image)
 
         holder.itemView.title.text = "test.."
+        holder.type = position % 2;
     }
 
 
     inner class MyHolder(view: View) : RecyclerView.ViewHolder(view) {
+        var type = 0;
+
         init {
-            view.onClick { view.context.startActivity<AppDetailActivity>() }
+            view.onClick {
+                if (type==0){
+
+                view.context.startActivity<AppDetailActivity>()
+                }else{
+                view.context.startActivity<ScrollingActivity>()
+
+                }
+            }
         }
     }
 }

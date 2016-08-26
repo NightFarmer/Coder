@@ -3,11 +3,12 @@ package com.nightfarmer.coder;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
+
+import com.nightfarmer.coder.main.MainActivity;
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +19,7 @@ import rx.functions.Action1;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends RxAppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -92,6 +93,7 @@ public class SplashActivity extends AppCompatActivity {
         });
 
         Observable.timer(5, TimeUnit.SECONDS)
+                .compose(this.<Long>bindToLifecycle())
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
