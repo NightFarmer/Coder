@@ -29,6 +29,7 @@ import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.*
+import java.util.concurrent.TimeUnit
 
 class MainActivity : RxAppCompatActivity() {
 
@@ -84,6 +85,18 @@ class MainActivity : RxAppCompatActivity() {
 //        test2()
 
 //        testDownLoad()
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
+        swipeRefreshLayout.setOnRefreshListener {
+            onRefresh()
+        }
+        swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
+        onRefresh()
+    }
+
+    private fun onRefresh() {
+        Observable.timer(3, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { swipeRefreshLayout.isRefreshing = false }
     }
 
     private fun testDownLoad() {

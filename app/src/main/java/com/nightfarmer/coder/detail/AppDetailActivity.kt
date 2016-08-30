@@ -9,6 +9,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.morgoo.droidplugin.pm.PluginManager
 import com.morgoo.helper.compat.PackageManagerCompat
 import com.nightfarmer.coder.R
@@ -21,6 +23,7 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindUntilEvent
 import kotlinx.android.synthetic.main.activity_app_detail.*
 import kotlinx.android.synthetic.main.activity_app_detail.view.*
+import kotlinx.android.synthetic.main.layout_app_item.*
 import okhttp3.ResponseBody
 import org.jetbrains.anko.onClick
 import org.jetbrains.anko.toast
@@ -56,16 +59,23 @@ class AppDetailActivity : RxAppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        webView.loadUrl("https://github.com/DroidPluginTeam/DroidPlugin/blob/master/readme.md")
 
-        bt_download.onClick {
+        tv_describe.text = "简介："
+//        bt_download.onClick {
 //            testDownLoad()
-            appInfo?.let {
-                onComplete((appInfo as AppFileInfo).file)
-            }
+//            appInfo?.let {
+//                onComplete((appInfo as AppFileInfo).file)
+//            }
 //            val intent = packageManager.getLaunchIntentForPackage(appInfo?.packageInfo?.packageName)
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 //            startActivity(intent)
-        }
+//        }
+    }
+
+    fun showWebView(view: View) {
+//        webView.loadUrl("https://github.com/DroidPluginTeam/DroidPlugin/blob/master/readme.md")
+        webView.visibility = View.VISIBLE
     }
 
     override fun onOptionsMenuClosed(menu: Menu?) {
@@ -84,7 +94,7 @@ class AppDetailActivity : RxAppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun startApp(view: View){
+    fun startApp(view: View) {
         appInfo?.let {
             onComplete((appInfo as AppFileInfo).file)
         }
@@ -128,7 +138,7 @@ class AppDetailActivity : RxAppCompatActivity() {
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ log("ok......$it");bt_download.text = it }, { log("failed...........$it") }, { onComplete(file) })
+                .subscribe({ log("ok......$it")/*;bt_download.text = it*/ }, { log("failed...........$it") }, { onComplete(file) })
     }
 
     private fun onComplete(file: File) {
