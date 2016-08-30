@@ -1,11 +1,15 @@
 package com.nightfarmer.coder.main
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.util.Log
+import com.morgoo.droidplugin.pm.PluginManager
 import com.nightfarmer.coder.main.MainAdapter
 import com.nightfarmer.coder.R
+import com.nightfarmer.coder.bean.AppFileInfo
 import com.nightfarmer.coder.bean.AppInfo
 import com.nightfarmer.coder.ex.log
 import com.nightfarmer.coder.service.AppInfoService
@@ -21,11 +25,14 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.*
 
 class MainActivity : RxAppCompatActivity() {
+
+    private var mainAdapter: MainAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +41,49 @@ class MainActivity : RxAppCompatActivity() {
         setSupportActionBar(toolBar)
 
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        recyclerView.adapter = MainAdapter()
+        mainAdapter = MainAdapter()
+        recyclerView.adapter = mainAdapter
+
+        Observable.just("23code")
+                .map {
+                    val sdPath: File
+                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {// SD卡
+                        sdPath = Environment.getExternalStorageDirectory()
+                    } else {// 内存
+                        sdPath = filesDir
+                    }
+//                    val appFolder = File(File(sdPath, "Coder"), "APP")
+                    val appFolder = File(sdPath, "23code")
+                    if (!appFolder.exists()) {
+                        appFolder.mkdirs()
+                    }
+                    appFolder
+                }
+                .map {
+                    val pm = this.packageManager
+                    it.listFiles().map {
+                        val info = pm.getPackageArchiveInfo(it.path, 0)
+                        val appFileInfo = AppFileInfo(it)
+//                        val info = PluginManager.getInstance().getPackageInfo(pkg, 0)
+
+                        appFileInfo.init(pm, this)
+//                        appFileInfo.name = pm.getApplicationLabel(info.applicationInfo).toString()
+                        appFileInfo
+                    }.toMutableList()
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    log(it)
+                    mainAdapter?.appList = it
+                    mainAdapter?.notifyDataSetChanged()
+                }, { log(it) })
 
 //        test1()
 
 //        test2()
 
-        testDownLoad()
+//        testDownLoad()
     }
 
     private fun testDownLoad() {

@@ -628,7 +628,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP00"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P00"
+            android:authorities="com.nightfarmer.droidplugin_stub_P00"
             android:exported="false"
             android:label="@string/stub_name_povider" />
 
@@ -1118,7 +1118,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP01"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P01"
+            android:authorities="com.nightfarmer.droidplugin_stub_P01"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP01" />
@@ -1606,7 +1606,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP02"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P02"
+            android:authorities="com.nightfarmer.droidplugin_stub_P02"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP02" />
@@ -2096,7 +2096,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP03"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P03"
+            android:authorities="com.nightfarmer.droidplugin_stub_P03"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP03" />
@@ -2585,7 +2585,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP04"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P04"
+            android:authorities="com.nightfarmer.droidplugin_stub_P04"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP04" />
@@ -3073,7 +3073,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP05"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P05"
+            android:authorities="com.nightfarmer.droidplugin_stub_P05"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP05" />
@@ -3563,7 +3563,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP06"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P06"
+            android:authorities="com.nightfarmer.droidplugin_stub_P06"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP06" />
@@ -4055,7 +4055,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP07"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P07"
+            android:authorities="com.nightfarmer.droidplugin_stub_P07"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP07" />
@@ -4544,7 +4544,7 @@
         </service>
         <provider
             android:name=".stub.ContentProviderStub$StubP08"
-            android:authorities="com.nightfarmer.coder.droidplugin_stub_P08"
+            android:authorities="com.nightfarmer.droidplugin_stub_P08"
             android:exported="false"
             android:label="@string/stub_name_povider"
             android:process=":PluginP08" />
