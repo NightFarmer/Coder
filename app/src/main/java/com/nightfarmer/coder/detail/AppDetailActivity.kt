@@ -95,9 +95,10 @@ class AppDetailActivity : RxAppCompatActivity() {
     }
 
     fun startApp(view: View) {
-        appInfo?.let {
-            onComplete((appInfo as AppFileInfo).file)
-        }
+//        appInfo?.let {
+//            onComplete((appInfo as AppFileInfo).file)
+//        }
+        testDownLoad();
     }
 
     private fun testDownLoad() {
@@ -111,23 +112,23 @@ class AppDetailActivity : RxAppCompatActivity() {
         if (!appFolder.exists()) {
             appFolder.mkdirs()
         }
-        val file = File(appFolder, "app-debug.apk")
-        if (file.exists()) {
-            onComplete(file)
-            return
-        }
+        val file = File(appFolder, "ThemeLib.apk")
+//        if (file.exists()) {
+//            onComplete(file)
+//            return
+//        }
 
 //        val myFile = File(getExternalFilesDir(null).toString() + File.separator + "WindowsXP_SP2.exe")
-
+//        https://nightfarmer.github.io/apkDepot/project/ThemeLib/sample.apk
         val downloadService = Retrofit.Builder()
 //                .baseUrl("http://speed.myzone.cn/")
-                .baseUrl("http://www.jqgj.com.cn/")
+                .baseUrl("https://nightfarmer.github.io/apkDepot/")
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
                 .create(AppInfoService::class.java)
 //        http://www.jqgj.com.cn/download/jqgj.apk
 //        downloadService.downloadFile("WindowsXP_SP2.exe")
-        downloadService.downloadFile("download/jqgj.apk")
+        downloadService.downloadFile("project/ThemeLib/sample.apk")
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .flatMap(Func1<ResponseBody, rx.Observable<kotlin.String>> { responseBody ->
                     Observable.create {

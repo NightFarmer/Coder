@@ -10,7 +10,7 @@ import com.morgoo.droidplugin.pm.PluginManager
 import com.nightfarmer.coder.main.MainAdapter
 import com.nightfarmer.coder.R
 import com.nightfarmer.coder.bean.AppFileInfo
-import com.nightfarmer.coder.bean.AppInfo
+import com.nightfarmer.coder.bean.ProjectInfo
 import com.nightfarmer.coder.ex.log
 import com.nightfarmer.coder.service.AppInfoService
 import com.nightfarmer.coder.ex.writeResponseBody
@@ -76,8 +76,8 @@ class MainActivity : RxAppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     log(it)
-                    mainAdapter?.appList = it
-                    mainAdapter?.notifyDataSetChanged()
+//                    mainAdapter?.appList = it
+//                    mainAdapter?.notifyDataSetChanged()
                 }, { log(it) })
 
 //        test1()
@@ -90,7 +90,32 @@ class MainActivity : RxAppCompatActivity() {
             onRefresh()
         }
         swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
-        onRefresh()
+//        onRefresh()
+
+        Retrofit.Builder()
+                .baseUrl(AppInfoService.HOST)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(AppInfoService::class.java)
+                .getAllProject()
+                .map {
+                    var fileInfo = AppFileInfo(File(""))
+                    fileInfo.name = it.projects.get(0).name
+                    fileInfo
+                }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+//                    log(it.projects.get(0))
+
+                    mainAdapter?.appList = mutableListOf(it)
+                    mainAdapter?.notifyDataSetChanged()
+
+                }, {
+                    log(it)
+                }
+                )
     }
 
     private fun onRefresh() {
@@ -146,12 +171,12 @@ class MainActivity : RxAppCompatActivity() {
 
         val listRepos = service.listRepos("octocat")
 
-        listRepos.enqueue(object : Callback<List<AppInfo>> {
-            override fun onFailure(call: Call<List<AppInfo>>?, t: Throwable?) {
+        listRepos.enqueue(object : Callback<List<ProjectInfo>> {
+            override fun onFailure(call: Call<List<ProjectInfo>>?, t: Throwable?) {
                 log(t)
             }
 
-            override fun onResponse(call: Call<List<AppInfo>>?, response: Response<List<AppInfo>>?) {
+            override fun onResponse(call: Call<List<ProjectInfo>>?, response: Response<List<ProjectInfo>>?) {
                 print(response)
                 response?.body()?.forEach {
                     log(it)

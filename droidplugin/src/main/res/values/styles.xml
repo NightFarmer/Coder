@@ -1,10 +1,10 @@
 <resources>
 
     <style name="DroidPluginTheme" parent="android:Theme.Light.NoTitleBar" >
-        <item name="android:windowBackground">@drawable/plugin_activity_loading</item>
+        <item name="android:windowBackground">@drawable/activity_loading</item>
     </style>
 
     <style name="DroidPluginThemeDialog" parent="android:Theme.Dialog" >
-        <item name="android:windowBackground">@drawable/plugin_activity_loading</item>
+        <item name="android:windowBackground">@drawable/activity_loading</item>
     </style>
 </resources>

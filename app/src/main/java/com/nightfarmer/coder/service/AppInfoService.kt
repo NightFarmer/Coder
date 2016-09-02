@@ -1,6 +1,7 @@
 package com.nightfarmer.coder.service
 
-import com.nightfarmer.coder.bean.AppInfo
+import com.nightfarmer.coder.bean.ProjectInfo
+import com.nightfarmer.coder.bean.ProjectDepot
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
@@ -15,14 +16,21 @@ import rx.Observable
 interface AppInfoService {
 
     @GET("users/{hehe}/repos")
-    fun xxx(@Path("hehe") hehe: String): Observable<List<AppInfo>>
+    fun xxx(@Path("hehe") hehe: String): Observable<List<ProjectInfo>>
 //    Call<List<Repo>> listRepos(@Path("user") String user);
 //    Call<List<Appinfo>> getUsers(@)
 
     @GET("users/{user}/repos")
-    fun listRepos(@Path("user") user: String): Call<List<AppInfo>>
+    fun listRepos(@Path("user") user: String): Call<List<ProjectInfo>>
 
     @Streaming
     @GET
     fun downloadFile(@Url fileUrl: String): Observable<ResponseBody>
+
+    companion object {
+        val HOST = "https://nightfarmer.github.io/apkDepot/"
+    }
+
+    @GET("project.json")
+    fun getAllProject(): Observable<ProjectDepot>
 }
