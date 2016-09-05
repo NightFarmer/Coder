@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 
+import com.nightfarmer.coder.local.LocalProActivity;
 import com.nightfarmer.coder.main.MainActivity;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
@@ -97,7 +98,7 @@ public class SplashActivity extends RxAppCompatActivity {
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
-                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                        startActivity(new Intent(SplashActivity.this, LocalProActivity.class));
                         finish();
                     }
                 });

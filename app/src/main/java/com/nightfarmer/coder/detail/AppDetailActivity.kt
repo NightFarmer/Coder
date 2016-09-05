@@ -15,6 +15,7 @@ import com.morgoo.droidplugin.pm.PluginManager
 import com.morgoo.helper.compat.PackageManagerCompat
 import com.nightfarmer.coder.R
 import com.nightfarmer.coder.bean.AppFileInfo
+import com.nightfarmer.coder.bean.ProjectInfo
 import com.nightfarmer.coder.ex.log
 import com.nightfarmer.coder.ex.writeResponseBody
 import com.nightfarmer.coder.service.AppInfoService
@@ -38,19 +39,40 @@ import java.util.concurrent.TimeUnit
 
 class AppDetailActivity : RxAppCompatActivity() {
 
-    private var appInfo: AppFileInfo? = null
+    private var appFileInfo: AppFileInfo? = null
+    private var proInfo: ProjectInfo? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_detail)
         setSupportActionBar(toolbar)
 
-        val appFile = intent.getSerializableExtra("appInfo") as? File
-        appFile?.let {
-            appInfo = AppFileInfo(appFile)
-            appInfo?.init(packageManager, this)
+        proInfo = intent.getSerializableExtra("appInfo") as? ProjectInfo
+
+        val appFile = intent.getSerializableExtra("appFile") as? File
+        if (appFile != null) {
+            appFileInfo = AppFileInfo(appFile)
+            appFileInfo?.init(packageManager, this)
+        } else {
+            val sdPath: File
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {// SD卡
+                sdPath = Environment.getExternalStorageDirectory()
+            } else {// 内存
+                sdPath = filesDir
+            }
+            val appFolder = File(File(sdPath, "Coder"), "APP")
+            val file = File(appFolder, proInfo?.apk)
+            if (file.exists()) {
+                try {
+                    val info = AppFileInfo(file)
+                    info.init(packageManager, this)
+                    appFileInfo = info
+                } catch(e: Exception) {
+                }
+            }
         }
-        title = appInfo?.name.orEmpty()
+        title = (appFileInfo?.name ?: proInfo?.name).orEmpty()
 
         backdrop.setImageResource(R.mipmap.ic_launcher)
 
@@ -61,17 +83,30 @@ class AppDetailActivity : RxAppCompatActivity() {
 
         webView.loadUrl("https://github.com/DroidPluginTeam/DroidPlugin/blob/master/readme.md")
 
-        tv_describe.text = "简介："
-//        bt_download.onClick {
-//            testDownLoad()
-//            appInfo?.let {
-//                onComplete((appInfo as AppFileInfo).file)
-//            }
-//            val intent = packageManager.getLaunchIntentForPackage(appInfo?.packageInfo?.packageName)
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//            startActivity(intent)
-//        }
+        tv_describe.text = "简介：${proInfo?.describe}"
+
+        if (appFileInfo == null) {
+            tv_state.text = "未下载"
+            floatingBtn.setImageResource(R.drawable.ic_get_app_white_48dp)
+        } else {
+            floatingBtn.progress = 1f
+            tv_state.text = "已下载"
+            floatingBtn.setImageResource(R.drawable.ic_play_arrow_white_48dp)
+        }
+
+        floatingBtn.onClick {
+            if (appFileInfo == null) {
+                testDownLoad()
+            } else {
+                val appFileInfo = appFileInfo as AppFileInfo
+                onComplete(appFileInfo.file)
+//                val intent = packageManager.getLaunchIntentForPackage(appFileInfo.packageInfo?.packageName)
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                startActivity(intent)
+            }
+        }
     }
+
 
     fun showWebView(view: View) {
 //        webView.loadUrl("https://github.com/DroidPluginTeam/DroidPlugin/blob/master/readme.md")
@@ -112,7 +147,8 @@ class AppDetailActivity : RxAppCompatActivity() {
         if (!appFolder.exists()) {
             appFolder.mkdirs()
         }
-        val file = File(appFolder, "ThemeLib.apk")
+//        val file = File(appFolder, "ThemeLib.apk")
+        val file = File(appFolder, proInfo?.apk)
 //        if (file.exists()) {
 //            onComplete(file)
 //            return
@@ -132,18 +168,39 @@ class AppDetailActivity : RxAppCompatActivity() {
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .flatMap(Func1<ResponseBody, rx.Observable<kotlin.String>> { responseBody ->
                     Observable.create {
-                        file.writeResponseBody(responseBody) { c, t -> it.onNext("$c/$t") }
+                        file.writeResponseBody(responseBody) { c -> it.onNext("$c/${responseBody.contentLength()}") }
                         it.onCompleted()
                     }
                 })
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ log("ok......$it")/*;bt_download.text = it*/ }, { log("failed...........$it") }, { onComplete(file) })
+                .subscribe({
+                    log("ok......$it")/*;bt_download.text = it*/
+                    val split = it.split("/")
+                    floatingBtn.progress = split[0].toFloat() / split[1].toFloat()
+                    tv_state.text = it
+                }, {
+                    log("failed...........$it")
+                    tv_state.text = "下载失败"
+                }, {
+                    onComplete(file)
+                    tv_state.text = "已下载"
+                    floatingBtn.setImageResource(R.drawable.ic_play_arrow_white_48dp)
+                })
     }
 
     private fun onComplete(file: File) {
         log("complete....")
+
+        if (file.exists()) {
+            try {
+                val info = AppFileInfo(file)
+                info.init(packageManager, this)
+                appFileInfo = info
+            } catch(e: Exception) {
+            }
+        }
 
         if (!PluginManager.getInstance().isConnected()) {
             Toast.makeText(this, "插件服务正在初始化，请稍后再试。。。", Toast.LENGTH_SHORT).show()
@@ -152,9 +209,12 @@ class AppDetailActivity : RxAppCompatActivity() {
             val pm = this.packageManager
             val info = pm.getPackageArchiveInfo(file.path, 0);
 
-            PluginManager.getInstance().deletePackage(info.packageName, 0);
+//            PluginManager.getInstance().deletePackage(info.packageName, 0);
             if (PluginManager.getInstance().getPackageInfo(info.packageName, 0) != null) {
-                Toast.makeText(this, "已经安装了，不能再安装", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "已经安装了，不能再安装", Toast.LENGTH_SHORT).show()
+                val intent = pm.getLaunchIntentForPackage(info.packageName)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
             } else {
                 Toast.makeText(this, "开始安装", Toast.LENGTH_SHORT).show()
                 Observable.create<Int> {

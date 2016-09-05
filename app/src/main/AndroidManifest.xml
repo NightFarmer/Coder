@@ -22,13 +22,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".detail.AppDetailActivity" />
         <activity android:name=".main.MainActivity" />
         <activity
             android:name=".ScrollingActivity"
             android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".local.LocalProActivity"></activity>
     </application>
 
 </manifest>

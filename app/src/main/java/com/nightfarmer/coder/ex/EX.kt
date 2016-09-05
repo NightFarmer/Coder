@@ -17,11 +17,11 @@ inline fun <reified T> T.debug(log: Any) {
     Log.i("mylog", "##################################")
 }
 
-fun File.writeResponseBody(response: ResponseBody, callBack: (Long, Long) -> Unit): Boolean {
-    return writeStream(response.byteStream(), response.contentLength(), callBack)
+fun File.writeResponseBody(response: ResponseBody, callBack: (Long) -> Unit): Boolean {
+    return writeStream(response.byteStream(), callBack)
 }
 
-fun File.writeStream(inputStream: InputStream, dataSize: Long = -1, callBack: (Long, Long) -> Unit): Boolean {
+fun File.writeStream(inputStream: InputStream, callBack: (Long) -> Unit): Boolean {
     var outputStream: OutputStream? = null
     try {
         val fileReader = ByteArray(4096)
@@ -34,7 +34,7 @@ fun File.writeStream(inputStream: InputStream, dataSize: Long = -1, callBack: (L
             }
             outputStream.write(fileReader, 0, read)
             fileSizeWrote += read.toLong()
-            callBack.invoke(fileSizeWrote, dataSize)
+            callBack.invoke(fileSizeWrote)
         }
         outputStream.flush()
         return true
