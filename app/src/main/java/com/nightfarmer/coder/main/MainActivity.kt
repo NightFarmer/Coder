@@ -3,6 +3,7 @@ package com.nightfarmer.coder.main
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.util.Log
@@ -18,7 +19,9 @@ import com.nightfarmer.coder.widget.ProcessFloatingButton
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import com.trello.rxlifecycle.kotlin.bindUntilEvent
+import kotlinx.android.synthetic.main.activity_app_detail.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main_content.*
 import okhttp3.ResponseBody
 import org.jetbrains.anko.toast
 import retrofit2.Call
@@ -60,6 +63,15 @@ class MainActivity : RxAppCompatActivity() {
         }
 
 //        ProcessFloatingButton(this,null)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true);// 给左上角图标的左边加上一个返回的图标
+//        supportActionBar?.title="yooo"
+        var mDrawerToggle = ActionBarDrawerToggle(this, main_activity_layout, toolBar, R.string.drawer_open, R.string.drawer_close);
+//声明mDrawerToggle对象,其中R.string.open和R.string.close简单可以用"open"和"close"替代
+
+        mDrawerToggle.syncState();//实现箭头和三条杠图案切换和抽屉拉合的同步
+
+        main_activity_layout.setDrawerListener(mDrawerToggle);//监听实现侧边栏的拉开和闭合,即抽屉drawer的闭合和打开
     }
 
     private fun onRefresh() {

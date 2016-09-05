@@ -7,7 +7,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager
 import com.nightfarmer.coder.R
 import com.nightfarmer.coder.bean.AppFileInfo
 import com.nightfarmer.coder.ex.log
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main_content.*
 import rx.Observable
 import rx.Subscriber
 import rx.Subscription
