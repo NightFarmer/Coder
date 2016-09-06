@@ -28,7 +28,9 @@
             android:name=".ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme" />
-        <activity android:name=".local.LocalProActivity"></activity>
+        <activity android:name=".local.LocalProActivity" />
+        <activity android:name=".theme.ThemeChooseActivity" />
+        <activity android:name=".about.AboutActivity"></activity>
     </application>
 
 </manifest>

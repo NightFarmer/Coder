@@ -1,7 +1,13 @@
 package com.nightfarmer.coder.ex
 
+import android.support.annotation.ColorRes
+import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.widget.TextView
+import com.nightfarmer.coder.R
 import okhttp3.ResponseBody
+import org.jetbrains.anko.find
 import java.io.*
 import java.net.CacheResponse
 
@@ -46,4 +52,9 @@ fun File.writeStream(inputStream: InputStream, callBack: (Long) -> Unit): Boolea
             outputStream.close()
         }
     }
+}
+
+fun Snackbar.setTextColor(@ColorRes color: Int): Snackbar {
+    this.view.find<TextView>(R.id.snackbar_text).setTextColor(ContextCompat.getColor(this.view.context, color))
+    return this
 }

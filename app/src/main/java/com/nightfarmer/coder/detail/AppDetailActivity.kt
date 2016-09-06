@@ -1,13 +1,16 @@
 package com.nightfarmer.coder.detail
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.os.RemoteException
 import android.support.design.widget.CollapsingToolbarLayout
+import android.support.design.widget.Snackbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -17,6 +20,7 @@ import com.nightfarmer.coder.R
 import com.nightfarmer.coder.bean.AppFileInfo
 import com.nightfarmer.coder.bean.ProjectInfo
 import com.nightfarmer.coder.ex.log
+import com.nightfarmer.coder.ex.setTextColor
 import com.nightfarmer.coder.ex.writeResponseBody
 import com.nightfarmer.coder.service.AppInfoService
 import com.trello.rxlifecycle.android.ActivityEvent
@@ -31,6 +35,7 @@ import org.jetbrains.anko.toast
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import rx.Observable
+import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Func1
 import rx.schedulers.Schedulers
@@ -39,52 +44,50 @@ import java.util.concurrent.TimeUnit
 
 class AppDetailActivity : RxAppCompatActivity() {
 
-    private var appFileInfo: AppFileInfo? = null
     private var proInfo: ProjectInfo? = null
+    private var appFileInfo: AppFileInfo? = null
+
+    private var subscribtion: Subscription? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_detail)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         proInfo = intent.getSerializableExtra("appInfo") as? ProjectInfo
-
         val appFile = intent.getSerializableExtra("appFile") as? File
+
         if (appFile != null) {
             appFileInfo = AppFileInfo(appFile)
             appFileInfo?.init(packageManager, this)
         } else {
-            val sdPath: File
-            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {// SD卡
-                sdPath = Environment.getExternalStorageDirectory()
-            } else {// 内存
-                sdPath = filesDir
-            }
-            val appFolder = File(File(sdPath, "Coder"), "APP")
-            val file = File(appFolder, proInfo?.apk)
-            if (file.exists()) {
-                try {
-                    val info = AppFileInfo(file)
-                    info.init(packageManager, this)
-                    appFileInfo = info
-                } catch(e: Exception) {
-                }
-            }
+            readLocalFile()
         }
+
+//        backdrop.setImageResource(R.mipmap.ic_launcher)
         title = (appFileInfo?.name ?: proInfo?.name).orEmpty()
-
-        backdrop.setImageResource(R.mipmap.ic_launcher)
-
-//        val collapsingToolbar = findViewById(R.id.collapsing_toolbar) as CollapsingToolbarLayout
-//        collapsingToolbar.title = "hehehehe"
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         webView.loadUrl("https://github.com/DroidPluginTeam/DroidPlugin/blob/master/readme.md")
-
         tv_describe.text = "简介：${proInfo?.describe}"
 
+        initUIInfo()
+
+        floatingBtn.onClick {
+            if (appFileInfo == null) {
+                downLoad()
+            } else {
+                val appFileInfo = appFileInfo as AppFileInfo
+                onComplete(appFileInfo.file)
+//                val intent = packageManager.getLaunchIntentForPackage(appFileInfo.packageInfo?.packageName)
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                startActivity(intent)
+            }
+        }
+
+    }
+
+    private fun initUIInfo() {
         if (appFileInfo == null) {
             tv_state.text = "未下载"
             floatingBtn.setImageResource(R.drawable.ic_get_app_white_48dp)
@@ -93,17 +96,26 @@ class AppDetailActivity : RxAppCompatActivity() {
             tv_state.text = "已下载"
             floatingBtn.setImageResource(R.drawable.ic_play_arrow_white_48dp)
         }
+    }
 
-        floatingBtn.onClick {
-            if (appFileInfo == null) {
-                testDownLoad()
-            } else {
-                val appFileInfo = appFileInfo as AppFileInfo
-                onComplete(appFileInfo.file)
-//                val intent = packageManager.getLaunchIntentForPackage(appFileInfo.packageInfo?.packageName)
-//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//                startActivity(intent)
+    private fun readLocalFile() {
+        val sdPath: File
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {// SD卡
+            sdPath = Environment.getExternalStorageDirectory()
+        } else {// 内存
+            sdPath = filesDir
+        }
+        val appFolder = File(File(sdPath, "Coder"), "APP")
+        val file = File(appFolder, proInfo?.apk)
+        if (file.exists()) {
+            try {
+                val info = AppFileInfo(file)
+                info.init(packageManager, this)
+                appFileInfo = info
+            } catch(e: Exception) {
             }
+        } else {
+            appFileInfo = null
         }
     }
 
@@ -122,21 +134,45 @@ class AppDetailActivity : RxAppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
+        when (item?.itemId) {
+            android.R.id.home -> onBackPressed()
+            R.id.menu_delete -> deleteAppFile()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    fun startApp(view: View) {
-//        appInfo?.let {
-//            onComplete((appInfo as AppFileInfo).file)
-//        }
-        testDownLoad();
+    private fun deleteAppFile() {
+        Observable.create<String> {
+            val fileInfo = appFileInfo
+            if (fileInfo == null || !fileInfo.file.exists()) {
+                it.onNext("文件不存在")
+            } else {
+                val delete = fileInfo.file.delete()
+                if (delete) {
+                    it.onNext("删除成功")
+                } else {
+                    it.onNext("删除失败")
+                }
+            }
+        }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    Snackbar.make(main_content, "$it!", Snackbar.LENGTH_SHORT).setTextColor(R.color.white).show()
+                    readLocalFile()
+                    initUIInfo()
+                }
     }
 
-    private fun testDownLoad() {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.app_detail, menu)
+        return true
+    }
+
+
+    private fun downLoad() {
+        if (!(subscribtion?.isUnsubscribed ?: true)) return
+        Snackbar.make(main_content, "开始下载!", Snackbar.LENGTH_SHORT).setTextColor(R.color.white).show()
         val sdPath: File
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {// SD卡
             sdPath = Environment.getExternalStorageDirectory()
@@ -164,7 +200,7 @@ class AppDetailActivity : RxAppCompatActivity() {
                 .create(AppInfoService::class.java)
 //        http://www.jqgj.com.cn/download/jqgj.apk
 //        downloadService.downloadFile("WindowsXP_SP2.exe")
-        downloadService.downloadFile("project/ThemeLib/sample.apk")
+        subscribtion = downloadService.downloadFile("project/ThemeLib/sample.apk")
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .flatMap(Func1<ResponseBody, rx.Observable<kotlin.String>> { responseBody ->
                     Observable.create {
