@@ -1,4 +1,4 @@
-package com.nightfarmer.coder.detail
+package com.nightfarmer.coder.function.detail
 
 import android.content.Intent
 import android.graphics.Color

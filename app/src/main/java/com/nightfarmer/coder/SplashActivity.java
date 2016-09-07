@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.view.View;
 
-import com.nightfarmer.coder.main.MainActivity;
+import com.nightfarmer.coder.function.main.MainActivity;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.concurrent.TimeUnit;

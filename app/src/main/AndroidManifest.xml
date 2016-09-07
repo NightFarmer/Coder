@@ -5,12 +5,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.morgoo.droidplugin.PluginApplication"
+        android:name=".CoderApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme_Default">
         <activity
             android:name=".SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -22,15 +22,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".detail.AppDetailActivity" />
-        <activity android:name=".main.MainActivity" />
+        <activity android:name=".function.detail.AppDetailActivity" />
+        <activity android:name=".function.main.MainActivity" />
         <activity
             android:name=".ScrollingActivity"
             android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".local.LocalProActivity" />
-        <activity android:name=".theme.ThemeChooseActivity" />
-        <activity android:name=".about.AboutActivity"></activity>
+            android:theme="@style/BaseTheme" />
+        <activity android:name=".function.local.LocalProActivity" />
+        <activity android:name=".function.theme.ThemeChooseActivity" />
+        <activity android:name=".function.about.AboutActivity"></activity>
     </application>
 
 </manifest>

@@ -1,21 +1,24 @@
-package com.nightfarmer.coder.main
+package com.nightfarmer.coder.function.main
 
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.TypedValue
 import com.nightfarmer.coder.R
-import com.nightfarmer.coder.about.AboutActivity
+import com.nightfarmer.coder.ColorTheme
+import com.nightfarmer.coder.function.about.AboutActivity
 import com.nightfarmer.coder.ex.log
-import com.nightfarmer.coder.local.LocalProActivity
+import com.nightfarmer.coder.function.local.LocalProActivity
 import com.nightfarmer.coder.service.AppInfoService
-import com.nightfarmer.coder.theme.ThemeChooseActivity
+import com.nightfarmer.coder.function.theme.ThemeChooseActivity
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.nav_header.*
 import kotlinx.android.synthetic.main.nav_header.view.*
+import kotlinx.android.synthetic.main.theme_choose_item.view.*
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
 import retrofit2.Retrofit
@@ -39,8 +42,7 @@ class MainActivity : RxAppCompatActivity() {
         mainAdapter = MainAdapter()
         recyclerView.adapter = mainAdapter
 
-
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary)
+        swipeRefreshLayout.setColorSchemeResources(ColorTheme.getThemeColorRes(this, R.attr.colorPrimary))
         swipeRefreshLayout.setOnRefreshListener {
             onRefresh()
         }

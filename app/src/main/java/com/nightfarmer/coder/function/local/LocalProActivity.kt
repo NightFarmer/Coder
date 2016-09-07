@@ -1,4 +1,4 @@
-package com.nightfarmer.coder.local
+package com.nightfarmer.coder.function.local
 
 import android.os.Bundle
 import android.os.Environment
@@ -77,13 +77,13 @@ class LocalProActivity : AppCompatActivity() {
                     appFileInfo
                 }
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe { localProAdapter?.appList?.clear();localProAdapter?.notifyDataSetChanged() }
+                .doOnSubscribe { localProAdapter?.clear();localProAdapter?.notifyDataSetChanged() }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     log(it)
-                    localProAdapter?.appList?.add(it)
-                    localProAdapter?.notifyItemInserted((localProAdapter?.appList?.size ?: 0) - 1)
+                    localProAdapter?.add(it)
+                    localProAdapter?.notifyItemInserted((localProAdapter?.itemCount ?: 0) - 1)
                 }, {
                     log(it)
                 })
